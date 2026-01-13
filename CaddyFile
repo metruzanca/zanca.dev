@@ -1,0 +1,37 @@
+# Global options for Railway proxy trust
+{
+  servers {
+    trusted_proxies static private_ranges
+  }
+}
+
+# Root domain (@) - proxy to zanca-dev service via internal networking
+{$DOMAIN}, www.{$DOMAIN} {
+  reverse_proxy zanca-dev.railway.internal:8080
+}
+
+# Bio subdomain - proxy to zanca-bio service via internal networking
+bio.{$DOMAIN} {
+  reverse_proxy zanca-bio.railway.internal:8080
+}
+
+
+# Minecraft subdomain - HTTP/HTTPS (ports 80/443) reverse proxy
+mc.{$DOMAIN} {
+  # Replace WEB_SERVER_IP:PORT with your web server IP and port
+  reverse_proxy http://WEB_SERVER_IP:WEB_SERVER_PORT
+}
+
+# Minecraft client proxy
+mc.{$DOMAIN}:25565 {
+  handle {
+    forward  tcp://MINECRAFT_IP:25565
+  }
+}
+
+
+# :25565 {
+#   tcp_proxy {
+#     to MINECRAFT_IP:25565
+#   }
+# }
