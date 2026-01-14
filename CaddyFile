@@ -6,32 +6,17 @@
 }
 
 # Root domain (@) - proxy to zanca-dev service via internal networking
-{$DOMAIN}, www.{$DOMAIN} {
+zanca.dev, www.zanca.dev {
   reverse_proxy zanca-dev.railway.internal:8080
 }
 
 # Bio subdomain - proxy to zanca-bio service via internal networking
-bio.{$DOMAIN} {
+bio.zanca.dev {
   reverse_proxy zanca-bio.railway.internal:8080
 }
 
 
-# Minecraft subdomain - HTTP/HTTPS (ports 80/443) reverse proxy
-mc.{$DOMAIN} {
-  # Replace WEB_SERVER_IP:PORT with your web server IP and port
-  reverse_proxy http://WEB_SERVER_IP:WEB_SERVER_PORT
+# Minecraft server Bluemap app
+mc.zanca.dev {
+  reverse_proxy http://216.201.72.56:27091
 }
-
-# Minecraft client proxy
-mc.{$DOMAIN}:25565 {
-  handle {
-    forward  tcp://MINECRAFT_IP:25565
-  }
-}
-
-
-# :25565 {
-#   tcp_proxy {
-#     to MINECRAFT_IP:25565
-#   }
-# }
