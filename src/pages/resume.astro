@@ -1,5 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
 import { resumeCache, type Work, type Skill } from '../data/resume';
 import { formatDateRange } from '../utils/datetime';
 
@@ -27,10 +27,10 @@ if (!resumeCache.get()) await resumeCache.refresh();
 const resume = resumeCache.get();
 ---
 
-<Base title="Resume — Sam Zanca">
+<SiteLayout title="Resume — Sam Zanca">
 	{
 		resume ? (
-			<article class="resume-article mx-auto max-w-3xl px-4 pb-24 pt-12">
+			<main class="resume-article mx-auto max-w-3xl px-4 pb-24 pt-14 md:pt-20">
 				<header class="mb-16">
 					<div class="flex flex-col gap-1">
 						<h1 class="text-glow-pink font-heading text-4xl font-extrabold tracking-tight md:text-5xl">
@@ -136,7 +136,7 @@ const resume = resumeCache.get();
 						</section>
 					)
 				}
-			</article>
+			</main>
 		) : (
 			<div class="flex items-center justify-center py-24">
 				<div class="text-center">
@@ -146,9 +146,9 @@ const resume = resumeCache.get();
 			</div>
 		)
 	}
-</Base>
+</SiteLayout>
 
-<style is:global media="print">
+<style is:inline media="print">
 	@page { margin: 0.5in; size: letter; }
 	body {
 		background: #fff !important;
