@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCache, addRefreshLoop } from './cache';
+import { getEnv } from '../env';
 
 export interface GithubRepo {
 	name: string;
@@ -67,7 +68,7 @@ const QUERY = `query($login: String!) {
 // ── Token resolution ─────────────────────────────────────────────────
 
 export function getGithubToken(): string | undefined {
-	const env = process.env.GITHUB_TOKEN?.trim();
+	const env = getEnv('GITHUB_TOKEN')?.trim();
 	if (env && env.length > 0) return env;
 	try {
 		const out = execSync('gh auth token', { encoding: 'utf8' }).trim();

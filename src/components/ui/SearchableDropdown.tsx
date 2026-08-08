@@ -14,7 +14,9 @@ const SearchableDropdown = (props: Props) => {
 	const ph = () => props.placeholder ?? 'Search...';
 
 	const style = () =>
-		props.origin ? `position: fixed; left: ${props.origin.x}px; top: ${props.origin.y}px; z-index: 30;` : '';
+		props.origin
+			? `position: fixed; left: ${props.origin.x}px; top: ${props.origin.y}px; z-index: 30;`
+			: 'position: fixed; left: 0; top: 0; z-index: 30;';
 
 	return (
 		<>

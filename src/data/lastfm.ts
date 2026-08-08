@@ -1,5 +1,6 @@
 import sharp from 'sharp';
 import { createCache, addRefreshLoop } from './cache';
+import { getEnv } from '../env';
 
 export interface Track {
 	name: string;
@@ -10,6 +11,17 @@ export interface Track {
 	date?: { text: string; uts: string };
 	attr?: { nowplaying: string };
 	formatted_time?: string;
+}
+
+// Raw shape returned by the Last.fm API (uses "#text" instead of "text").
+interface RawTrack {
+	name?: string;
+	artist?: { '#text'?: string };
+	album?: { '#text'?: string };
+	url?: string;
+	image?: { '#text'?: string; size?: string }[];
+	date?: { text: string; uts: string };
+	attr?: { nowplaying: string };
 }
 
 export interface NowPlayingData {
@@ -74,8 +86,8 @@ async function colorTrack(nowPlaying: Track | undefined, recent: Track[]): Promi
 }
 
 export async function fetchLastfmData(): Promise<NowPlayingData | undefined> {
-	const apiKey = process.env.LASTFM_API_KEY;
-	const username = process.env.LASTFM_USERNAME;
+	const apiKey = getEnv('LASTFM_API_KEY');
+	const username = getEnv('LASTFM_USERNAME');
 	if (!apiKey || !username) return undefined;
 
 	const nowTs = Math.floor(Date.now() / 1000);
@@ -96,7 +108,7 @@ export async function fetchLastfmData(): Promise<NowPlayingData | undefined> {
 		const recentBody = await recentRes.text();
 		const userBody = await userRes.text();
 
-		let recentResponse: { recenttracks?: { track: Track[] } };
+		let recentResponse: { recenttracks?: { track: RawTrack[] } };
 		try {
 			recentResponse = JSON.parse(recentBody);
 		} catch {
@@ -111,7 +123,15 @@ export async function fetchLastfmData(): Promise<NowPlayingData | undefined> {
 			/* ignore */
 		}
 
-		const allTracks = recentResponse.recenttracks?.track ?? [];
+		const allTracks: Track[] = (recentResponse.recenttracks?.track ?? []).map((t) => ({
+			name: t.name ?? '',
+			artist: { text: t.artist?.['#text'] ?? '' },
+			album: { text: t.album?.['#text'] ?? '' },
+			url: t.url ?? '',
+			image: (t.image ?? []).map((img) => ({ text: img?.['#text'] ?? '', size: img?.size ?? '' })),
+			date: t.date,
+			attr: t.attr,
+		}));
 
 		const scrobblesToday = allTracks.filter((t) => {
 			const uts = parseInt(t.date?.uts ?? '', 10);

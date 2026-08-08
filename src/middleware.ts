@@ -6,8 +6,9 @@ import './data/atproto';
 import type { MiddlewareHandler } from 'astro';
 
 export const onRequest: MiddlewareHandler = async (_context, next) => {
-	// On the first request this awaits the initial refresh of all data
-	// sources; afterwards it resolves immediately.
-	await startDataServices();
+	// Kick off the data warm-up (fresh fetch of every source, then staggered
+	// refresh loops) on the first request without blocking it. Pages that
+	// depend on a specific source await their own cache when empty.
+	startDataServices();
 	return next();
 };

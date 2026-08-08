@@ -8,6 +8,9 @@ import GitActivity from '../components/portfolio/GitActivity.astro';
 import NowPlaying from '../components/portfolio/NowPlaying.astro';
 import NowPlayingStats from '../components/portfolio/NowPlayingStats.astro';
 import Contact from '../components/portfolio/Contact.astro';
+import { lastfmCache } from '../data/lastfm';
+
+if (!lastfmCache.get()) await lastfmCache.refresh();
 ---
 
 <SiteLayout title="Sam Zanca — Full-Stack Engineer">

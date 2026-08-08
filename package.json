@@ -7,10 +7,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/fetch-github.mjs",
+    "prebuild": "node --env-file-if-exists=.env scripts/fetch-github.mjs",
     "build": "astro build",
     "check": "astro check",
-    "start": "node dist/server/entry.mjs",
+    "start": "node --env-file-if-exists=.env dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

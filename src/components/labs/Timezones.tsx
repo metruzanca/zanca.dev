@@ -376,7 +376,7 @@ const Timezones = () => {
 									class="inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-lg border border-border bg-background px-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
 									onClick={() => {
 										setShowPicker((s) => !s);
-										if (!showPicker()) setPickerOrigin(getPickerOrigin());
+										if (showPicker()) setPickerOrigin(getPickerOrigin());
 									}}
 								>
 									+ Add Timezone
