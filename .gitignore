@@ -3,7 +3,7 @@ dist/
 # generated types
 .astro/
 # build-time generated data (GitHub snapshot)
-data/
+/data/
 
 # dependencies
 node_modules/
