@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
 import solid from '@astrojs/solid-js';
 import tailwindcss from '@tailwindcss/vite';
-import { copyFileSync, mkdirSync, readdirSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const domain =
@@ -19,23 +19,34 @@ export default defineConfig({
 		{
 			name: 'copy-content',
 			hooks: {
-				'astro:build:done': async ({ dir }) => {
-					// Make markdown content available to the standalone SSR server.
-					const root = join(dir.pathname, '..');
-					for (const sub of ['blog', 'projects']) {
-						const src = join(process.cwd(), 'content', sub);
-						const dest = join(root, 'content', sub);
-						let files;
-						try {
-							files = readdirSync(src).filter((f) => f.endsWith('.md'));
-						} catch (err) {
-							console.error(`[copy-content] read ${sub} failed:`, err);
-							continue;
-						}
-						mkdirSync(dest, { recursive: true });
-						for (const f of files) copyFileSync(join(src, f), join(dest, f));
+			'astro:build:done': async ({ dir }) => {
+				// Make markdown content available to the standalone SSR server.
+				const root = join(dir.pathname, '..');
+				for (const sub of ['blog', 'projects']) {
+					const src = join(process.cwd(), 'content', sub);
+					const dest = join(root, 'content', sub);
+					let files;
+					try {
+						files = readdirSync(src).filter((f) => f.endsWith('.md'));
+					} catch (err) {
+						console.error(`[copy-content] read ${sub} failed:`, err);
+						continue;
 					}
-				},
+					mkdirSync(dest, { recursive: true });
+					for (const f of files) copyFileSync(join(src, f), join(dest, f));
+				}
+				// Make the build-time GitHub snapshot available too.
+				const snapshot = join(process.cwd(), 'data', 'github.snapshot.json');
+				try {
+					if (existsSync(snapshot)) {
+						const dest = join(root, 'data');
+						mkdirSync(dest, { recursive: true });
+						copyFileSync(snapshot, join(dest, 'github.snapshot.json'));
+					}
+				} catch (err) {
+					console.error('[copy-content] copy snapshot failed:', err);
+				}
+			},
 			},
 		},
 	],
