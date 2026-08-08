@@ -1,3 +1,6 @@
+import { Client, ok, simpleFetchHandler } from '@atcute/client';
+import type { ComAtprotoIdentityResolveHandle, ComAtprotoRepoListRecords } from '@atcute/atproto';
+import type { SiteStandardDocument } from '@atcute/standard-site';
 import { createCache, addRefreshLoop } from './cache';
 import { slugify, setLivePosts, type BlogPost } from './blog';
 import { estimateReadTime, type Block, type Inline } from './content';
@@ -5,6 +8,10 @@ import { atprotoHandle } from '../env';
 
 const ATPROTO_REFRESH_MS = 60 * 60 * 1000;
 const DOCUMENT_NSID = 'site.standard.document';
+
+function clientFor(service: string): Client {
+	return new Client({ handler: simpleFetchHandler({ service }) });
+}
 
 // ── Handle & PDS resolution (ports atcrab's handle.rs + did.rs) ──────
 
@@ -19,21 +26,20 @@ async function resolveHandle(handle: string): Promise<string | undefined> {
 			if (did.startsWith('did:')) return did;
 		}
 	} catch {
-		/* fall through to bsky resolver */
+		/* fall through to the XRPC resolver */
 	}
 	try {
-		const res = await fetch(
-			`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${encodeURIComponent(handle)}`,
-			{ signal: AbortSignal.timeout(10_000) }
-		);
-		if (res.ok) {
-			const data = (await res.json()) as { did?: string };
-			if (data.did) return data.did;
-		}
+		const client = clientFor('https://bsky.social');
+	const { did }: ComAtprotoIdentityResolveHandle.$output = await ok(
+		client.get('com.atproto.identity.resolveHandle', {
+			params: { handle: handle as `${string}.${string}` },
+			signal: AbortSignal.timeout(10_000),
+		})
+	);
+		return did;
 	} catch {
-		/* ignore */
+		return undefined;
 	}
-	return undefined;
 }
 
 async function resolvePds(did: string): Promise<string | undefined> {
@@ -66,18 +72,28 @@ interface RecordValue {
 }
 
 async function fetchAllRecords(did: string, pds: string, collection: string): Promise<RecordValue[]> {
+	const client = clientFor(pds);
 	const records: RecordValue[] = [];
 	let cursor: string | undefined;
 	for (;;) {
-		const url = `${pds}/xrpc/com.atproto.repo.listRecords?repo=${encodeURIComponent(
-			did
-		)}&collection=${collection}&limit=100${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`;
-		const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
-		if (!res.ok) break;
-		const page = (await res.json()) as { records?: RecordValue[]; cursor?: string };
-		records.push(...(page.records ?? []));
-		cursor = page.cursor;
-		if (!cursor) break;
+		try {
+			const page: ComAtprotoRepoListRecords.$output = await ok(
+				client.get('com.atproto.repo.listRecords', {
+					params: {
+						repo: did as ComAtprotoRepoListRecords.$params['repo'],
+						collection: collection as ComAtprotoRepoListRecords.$params['collection'],
+						limit: 100,
+						cursor,
+					},
+					signal: AbortSignal.timeout(15_000),
+				})
+			);
+			records.push(...page.records);
+			cursor = page.cursor;
+			if (!cursor) break;
+		} catch {
+			break;
+		}
 	}
 	return records;
 }
@@ -259,27 +275,16 @@ function byteToUtf16(text: string, byteIndex: number): number {
 	return text.length;
 }
 
-function documentToPost(
-	doc: {
-		title?: string;
-		description?: string | null;
-		publishedAt?: string;
-		tags?: string[] | null;
-		content?: unknown;
-		textContent?: string | null;
-		coverImage?: { blob?: { ref?: { $link?: string } } } | null;
-	},
-	did: string,
-	pds: string
-): BlogPost | null {
+function documentToPost(doc: SiteStandardDocument.Main, did: string, pds: string): BlogPost | null {
 	if (typeof doc.title !== 'string' || doc.title.length === 0) return null;
 
 	const body = blocksToBody(doc.content, doc.textContent ?? undefined, did, pds);
 
-	if (doc.coverImage?.blob?.ref?.$link) {
+	const cover = doc.coverImage;
+	if (cover && 'ref' in cover && cover.ref.$link) {
 		body.unshift({
 			type: 'paragraph',
-			children: [{ type: 'image', alt: doc.title, src: blobUrl(pds, did, doc.coverImage.blob.ref.$link) }],
+			children: [{ type: 'image', alt: doc.title, src: blobUrl(pds, did, cover.ref.$link) }],
 		});
 	}
 
@@ -313,7 +318,7 @@ export async function fetchLivePosts(): Promise<BlogPost[]> {
 	const posts: BlogPost[] = [];
 	for (const record of records) {
 		if (typeof record.value !== 'object' || record.value === null) continue;
-		const post = documentToPost(record.value as Parameters<typeof documentToPost>[0], did, pds);
+		const post = documentToPost(record.value as SiteStandardDocument.Main, did, pds);
 		if (post) posts.push(post);
 	}
 
