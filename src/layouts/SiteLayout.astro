@@ -1,0 +1,101 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/portfolio/Nav.astro';
+import CommandPalette from '../components/CommandPalette';
+import { publishedPosts } from '../data/blog';
+import { allProjects } from '../data/projects';
+import { labs } from '../components/labs/registry';
+import type { CommandPageItem } from '../components/CommandPalette';
+
+interface Props {
+	title?: string;
+}
+
+const { title } = Astro.props;
+
+const items: CommandPageItem[] = [
+	{
+		title: 'Landing',
+		description: 'Portfolio overview — projects, writing, music',
+		url: '/',
+		section: 'Navigation',
+	},
+	{
+		title: 'Projects',
+		description: 'Open source work and contributions on GitHub',
+		url: '/projects',
+		section: 'Navigation',
+	},
+	{
+		title: 'Blog',
+		description: 'Articles on Rust, web development, and technology',
+		url: '/blog',
+		section: 'Navigation',
+	},
+	{
+		title: 'Labs',
+		description: 'Small tools, experiments, and utilities',
+		url: '/labs',
+		section: 'Navigation',
+	},
+	{
+		title: 'Music',
+		description: "What I'm listening to right now via Last.fm",
+		url: '/music',
+		section: 'Navigation',
+	},
+	{
+		title: 'Design System',
+		description: 'Component library and design token showcase',
+		url: '/design-system',
+		section: 'Navigation',
+	},
+	{
+		title: 'Resume',
+		description: 'Professional experience, skills, and work history',
+		url: '/resume',
+		section: 'Navigation',
+	},
+];
+
+for (const lab of labs) {
+	items.push({
+		title: lab.meta.name,
+		description: lab.meta.description,
+		url: `/labs/${lab.meta.slug}`,
+		section: 'Labs',
+	});
+}
+
+for (const post of publishedPosts()) {
+	items.push({
+		title: post.frontmatter.title,
+		description: post.frontmatter.description,
+		url: `/blog/${post.slug}`,
+		section: 'Blog',
+	});
+}
+
+for (const project of allProjects()) {
+	const desc = project.frontmatter.company
+		? `${project.frontmatter.company} — ${project.frontmatter.description}`
+		: project.frontmatter.description;
+	items.push({
+		title: project.frontmatter.title,
+		description: desc,
+		url: `/projects/${project.slug}`,
+		section: 'Case Studies',
+	});
+}
+---
+
+<Base title={title}>
+	<div class="relative min-h-screen bg-background">
+		<div
+			class="pointer-events-none fixed inset-0 synth-grid opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]"
+		></div>
+		<Nav />
+		<slot />
+		<CommandPalette client:load items={items} />
+	</div>
+</Base>

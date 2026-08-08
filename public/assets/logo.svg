@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <clipPath id="clip-Logo_v2">
+      <rect width="600" height="600"/>
+    </clipPath>
+  </defs>
+  <g id="Logo_v2" data-name="Logo v2" clip-path="url(#clip-Logo_v2)">
+    <rect width="600" height="600" fill="#211e31"/>
+    <path id="Subtraction_2" data-name="Subtraction 2" d="M230.087,200.074H0L115.043,0l1.164,2.024L53.017,157.064H205.356l24.73,43.009Z" transform="translate(358.987 299.73) rotate(180)" fill="#f6df4c"/>
+    <path id="Subtraction_16" data-name="Subtraction 16" d="M230.087,200.074H0L115.043,0l1.164,2.024L53.017,157.064H205.356l24.73,43.009Z" transform="translate(243.9 299.657)" fill="#f6df4c"/>
+    <path id="Slash" d="M28.4,478.046,165.926,39.677l57.421-12.205L86.563,465.683,28.4,478.049Z" transform="matrix(0.978, 0.208, -0.208, 0.978, 229.139, 27.248)" fill="#f6df4c"/>
+  </g>
+</svg>

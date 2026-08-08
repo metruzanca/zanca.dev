@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Redirecting — Sam Zanca">
+	<meta http-equiv="refresh" content="0; url=/" />
+	<div class="flex min-h-screen items-center justify-center bg-background px-4">
+		<p class="font-mono text-sm text-muted-foreground">Redirecting to the homepage…</p>
+	</div>
+</Base>
+
+<script>
+	window.location.replace('/');
+</script>

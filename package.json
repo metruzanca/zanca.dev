@@ -7,11 +7,31 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/fetch-github.mjs",
     "build": "astro build",
+    "check": "astro check",
+    "start": "node dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.2.0"
+    "@astrojs/node": "^11.1.0",
+    "@astrojs/solid-js": "^7.0.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.0",
+    "js-yaml": "^5.2.3",
+    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-gfm": "^3.1.0",
+    "micromark-extension-gfm": "^3.0.0",
+    "sharp": "^0.35.3",
+    "shiki": "^4.4.2",
+    "solid-js": "^1.9.14",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/js-yaml": "^4.0.9",
+    "@types/mdast": "^4.0.4",
+    "typescript": "^6.0.3"
   }
 }

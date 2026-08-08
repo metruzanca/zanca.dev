@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import { siteDomain } from '../env';
+
+interface Props {
+	title?: string;
+}
+
+const { title = 'Sam Zanca — Full-Stack Engineer' } = Astro.props;
+const domain = siteDomain();
+const ogImage = `https://${domain}/assets/synthwave-horizon.png`;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" href="/assets/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&family=Orbitron:wght@500;600;700;800;900&display=swap"
+		/>
+
+		<meta name="description" content="Sam Zanca — Full-stack engineer building fast, reliable products with Rust and modern web technologies. Portfolio, blog, and projects." />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#0c0a1f" />
+
+		<meta property="og:title" content="Sam Zanca — Full-Stack Engineer" />
+		<meta property="og:description" content="Building fast, reliable products with Rust and modern web technologies." />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={`https://${domain}/`} />
+		<meta property="og:image" content={ogImage} />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Sam Zanca — Full-Stack Engineer" />
+		<meta name="twitter:description" content="Building fast, reliable products with Rust and modern web technologies." />
+		<meta name="twitter:image" content={ogImage} />
+
+		<script
+			is:inline
+			defer
+			src="https://umami-production-6edd.up.railway.app/script.js"
+			type="text/javascript"
+			data-website-id="b3d56abc-c1d1-4921-8372-36ab2e5abc7d"
+		></script>
+
+		<slot name="head" />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
