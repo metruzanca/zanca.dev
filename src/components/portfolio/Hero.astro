@@ -1,0 +1,42 @@
+---
+import { MapPin } from '../ui/icons/index';
+---
+
+<section id="top" class="px-4 pb-12 pt-14 md:pt-20">
+	<h1
+		class="mt-5 font-display text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-balance text-foreground md:text-6xl"
+	>
+		Hi, I'm
+		<span class="text-primary text-glow-pink">Sam</span>
+		!
+	</h1>
+
+	<p class="mt-5 max-w-xl text-pretty leading-relaxed text-muted-foreground md:text-lg">
+		A full-stack engineer who builds fast, reliable products for the open web.
+		Years of React and TypeScript, now chasing performance with Go and Rust.
+		I value simplicity, minimalism, and shipping things that work.
+	</p>
+
+	<div class="mt-5 flex flex-wrap items-center gap-4 font-mono text-xs text-muted-foreground">
+		<span class="inline-flex items-center gap-1.5">
+			<MapPin class="size-3.5 text-primary" />
+			Jersey City, NJ
+		</span>
+		<span class="inline-flex items-center gap-1.5">
+			<span class="size-1.5 rounded-full bg-accent shadow-glow-cyan"></span>
+			React · TypeScript · Go · Rust
+		</span>
+	</div>
+
+	<p class="mt-5 font-mono text-sm text-muted-foreground">
+		Learn more
+		<a href="/about" class="text-accent transition-colors hover:text-glow-cyan hover:underline">
+			about me
+		</a>
+		or read about my
+		<a href="/how-i-work" class="text-accent transition-colors hover:text-glow-cyan hover:underline">
+			working style
+		</a>
+		.
+	</p>
+</section>

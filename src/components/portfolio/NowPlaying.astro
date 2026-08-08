@@ -1,0 +1,83 @@
+---
+import { lastfmCache, type Track } from '../../data/lastfm';
+import { MusicNote } from '../ui/icons/index';
+import AlbumArt from './AlbumArt.astro';
+
+const BARS = 30;
+
+function trackImage(track: Track): string {
+	const last = track.image[track.image.length - 1];
+	const first = track.image[0];
+	return (last?.text && last.text.length > 0 ? last : first)?.text ?? '';
+}
+
+const data = lastfmCache.get();
+let isPlaying = false;
+let track: Track | null = null;
+let barColor = 'var(--neon-pink)';
+
+if (data) {
+	isPlaying = !!data.now_playing;
+	track = data.now_playing ?? data.recent_tracks[0] ?? null;
+	barColor = data.dominant_color ?? 'var(--neon-pink)';
+}
+
+const trackName = track?.name ?? '';
+const trackArtist = track?.artist.text ?? '';
+const img = track ? trackImage(track) : '';
+---
+
+{
+	!data || !track ? (
+		<a href="/music" class="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50">
+			<div class="flex items-center gap-3">
+				<div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+					<MusicNote class="size-4 text-muted-foreground" />
+				</div>
+				<p class="font-mono text-xs text-muted-foreground">not listening right now</p>
+			</div>
+		</a>
+	) : (
+		<a href="/music" class="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50">
+			<div class="flex items-center gap-3">
+				<div class="relative shrink-0">
+					<AlbumArt
+						src={img}
+						class="size-12 rounded-lg border border-border object-cover"
+						fallbackClass="flex size-12 items-center justify-center rounded-lg bg-muted"
+						alt={`${trackName} album art`}
+						iconClass="size-4 text-muted-foreground"
+					/>
+				</div>
+
+				<div class="min-w-0 flex-1">
+					<div class="flex items-baseline gap-2">
+						<span class={`font-mono text-[0.65rem] uppercase tracking-wider ${isPlaying ? 'text-accent' : 'text-muted-foreground'}`}>
+							{isPlaying ? 'now playing' : 'last played'}
+						</span>
+					</div>
+					<p class="mt-0.5 truncate text-sm font-semibold text-foreground" title={trackName}>
+						{trackName}
+					</p>
+					<p class="truncate font-mono text-xs text-muted-foreground" title={trackArtist}>
+						{trackArtist}
+					</p>
+				</div>
+
+				{isPlaying ? (
+					<div class="waveform-wrapper hidden shrink-0 md:flex">
+						{Array.from({ length: BARS }, (_, i) => (
+							<div class="waveform-bar playing" style={`--i: ${i}; background-color: ${barColor}`}></div>
+						))}
+					</div>
+				) : (
+					<div class="waveform-wrapper hidden shrink-0 opacity-35 md:flex">
+						{Array.from({ length: BARS }, (_, i) => (
+							<div class="waveform-bar idle" style={`--i: ${i}; background-color: ${barColor}`}></div>
+						))}
+					</div>
+				)}
+			</div>
+		</a>
+	)
+}

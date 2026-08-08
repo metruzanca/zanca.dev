@@ -1,0 +1,27 @@
+---
+interface Props {
+	index: string;
+	label: string;
+	action?: { label: string; href: string };
+}
+
+const { index, label, action } = Astro.props;
+---
+
+<div class="mb-6 flex items-baseline justify-between gap-4 border-b border-border pb-2">
+	<h2 class="font-mono text-sm text-muted-foreground">
+		<span class="text-primary">{index}</span>
+		{" // "}
+		<span class="text-foreground">{label}</span>
+	</h2>
+	{
+		action && (
+			<a
+				href={action.href}
+				class="font-mono text-xs text-muted-foreground transition-colors hover:text-glow-cyan hover:text-accent"
+			>
+				{action.label} →
+			</a>
+		)
+	}
+</div>

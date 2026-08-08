@@ -1,0 +1,45 @@
+---
+import type { BlogPost } from '../../data/blog';
+import { formatFullDate } from '../../utils/datetime';
+
+interface Props {
+	post: BlogPost;
+	expanded?: boolean;
+}
+
+const { post, expanded = false } = Astro.props;
+const slug = post.slug;
+const date = formatFullDate(post.frontmatter.timestamp);
+const readTime = post.readTime;
+const isExpanded = expanded;
+---
+
+<li class="group border-b border-border transition-colors hover:border-accent/50">
+	<a class="flex cursor-pointer items-baseline gap-4 py-3.5" href={`/blog/${slug}`}>
+		<time class="hidden w-28 shrink-0 font-mono text-xs text-muted-foreground sm:block">{date}</time>
+		<span class="flex-1 text-pretty text-sm text-foreground transition-colors group-hover:text-glow-cyan group-hover:text-accent md:text-base">
+			{post.frontmatter.title}
+		</span>
+		<span class="w-14 shrink-0 text-right font-mono text-xs text-muted-foreground">{readTime} min</span>
+	</a>
+	<div class={isExpanded ? '' : 'max-h-0 overflow-hidden transition-all duration-200 group-hover:max-h-24'}>
+		<div class="flex gap-4 pb-3.5">
+			<span class="hidden w-28 shrink-0 sm:block"></span>
+			<div class="flex-1">
+				{post.frontmatter.description.length > 0 && (
+					<p class="text-sm leading-relaxed text-muted-foreground">{post.frontmatter.description}</p>
+				)}
+				{post.frontmatter.tags.length > 0 && (
+					<div class="mt-2 flex flex-wrap gap-1.5">
+						{post.frontmatter.tags.map((tag) => (
+							<span class="rounded-md border border-border/60 px-2 py-0.5 font-mono text-[0.65rem] text-muted-foreground">
+								#{tag}
+							</span>
+						))}
+					</div>
+				)}
+			</div>
+			<span class="hidden w-14 shrink-0 sm:block"></span>
+		</div>
+	</div>
+</li>

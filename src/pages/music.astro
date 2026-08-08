@@ -1,0 +1,190 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { lastfmCache, type Track } from '../data/lastfm';
+import AlbumArt from '../components/portfolio/AlbumArt.astro';
+
+function renderScrobbles(count: number): string {
+	return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
+}
+
+function trackImage(track: Track): string {
+	const last = track.image[track.image.length - 1];
+	const first = track.image[0];
+	return (last?.text && last.text.length > 0 ? last : first)?.text ?? '';
+}
+
+const data = lastfmCache.get();
+---
+
+<SiteLayout title="Music — Sam Zanca">
+	<main class="mx-auto max-w-3xl px-4 pb-24 pt-14 md:pt-20">
+		<header class="mb-12">
+			<h1 class="font-display text-4xl font-extrabold uppercase text-foreground md:text-6xl">
+				<span class="text-glow-pink text-primary">music </span>
+				I like
+			</h1>
+			<p class="mt-4 max-w-xl font-mono text-sm text-muted-foreground">
+				What I'm listening to, powered by
+				<a href="https://last.fm" target="_blank" rel="noreferrer" class="text-accent hover:underline">
+					Last.fm
+				</a>
+			</p>
+		</header>
+
+		{
+			!data ? (
+				<div class="flex items-center justify-center py-24">
+					<p class="font-mono text-sm text-muted-foreground">
+						Couldn't fetch listening data. Make sure LASTFM_API_KEY and LASTFM_USERNAME are set.
+					</p>
+				</div>
+			) : (
+				<>
+					<section class="mb-12">
+						<div class="grid grid-cols-2 gap-4">
+							<div class="rounded-xl border border-border bg-card p-5">
+								<dt class="font-mono text-xs uppercase tracking-widest text-muted-foreground">total scrobbles</dt>
+								<dd class="mt-1 font-display text-3xl font-bold text-foreground">
+									{renderScrobbles(data.total_scrobbles)}
+								</dd>
+							</div>
+							<div class="rounded-xl border border-border bg-card p-5">
+								<dt class="font-mono text-xs uppercase tracking-widest text-muted-foreground">today</dt>
+								<dd class="mt-1 font-display text-3xl font-bold text-foreground">{data.scrobbles_today}</dd>
+							</div>
+						</div>
+					</section>
+
+					<section class="mb-12">
+						<h2 class="mb-6 font-heading text-2xl font-bold tracking-tight text-foreground">
+							<span class="text-glow-cyan text-accent">{'>\u00A0'}</span>
+							Now
+						</h2>
+
+						<div class="rounded-xl border border-border bg-card p-6 md:p-8">
+							<div class="flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
+								{
+									(() => {
+										const track = data.now_playing ?? data.recent_tracks[0];
+										if (!track) return null;
+										return (
+											<div class="relative shrink-0">
+												<AlbumArt
+													src={trackImage(track)}
+													class="size-44 rounded-xl border border-border object-cover md:size-52"
+													fallbackClass="flex size-44 md:size-52 items-center justify-center rounded-xl bg-muted"
+													alt={`${track.name} album art`}
+													iconClass="size-10 text-muted-foreground"
+												/>
+											</div>
+										);
+									})()
+								}
+
+								<div class="min-w-0 flex-1">
+									{
+										(() => {
+											const track = data.now_playing ?? data.recent_tracks[0];
+											if (!track) return null;
+											const isPlaying = !!data.now_playing;
+											return (
+												<>
+													<div class="mb-1 flex items-center gap-2">
+														<span class={`font-mono text-[0.7rem] uppercase tracking-widest ${isPlaying ? 'text-accent' : 'text-muted-foreground'}`}>
+															{isPlaying ? 'now playing' : 'last played'}
+														</span>
+														{isPlaying && (
+															<span class="relative flex size-1.5">
+																<span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span>
+																<span class="relative size-1.5 rounded-full bg-accent"></span>
+															</span>
+														)}
+													</div>
+
+													<h3 class="truncate text-2xl font-bold text-foreground">{track.name}</h3>
+													<p class="mt-1 text-lg text-muted-foreground">{track.artist.text}</p>
+													{track.album.text.length > 0 && (
+														<p class="mt-1 font-mono text-sm text-muted-foreground">{track.album.text}</p>
+													)}
+
+													<a
+														href={track.url}
+														target="_blank"
+														rel="noreferrer"
+														class="mt-2 inline-flex items-center gap-1 font-mono text-xs text-muted-foreground transition-colors hover:text-accent"
+													>
+														↗ open on last.fm
+													</a>
+												</>
+											);
+										})()
+									}
+								</div>
+							</div>
+
+							{
+								data.now_playing && (
+									<div class="mt-6">
+										<div class="music-waveform">
+											{Array.from({ length: 80 }, (_, i) => (
+												<div
+													class="music-bar playing"
+													style={`--i: ${i}; background-color: ${data.dominant_color ?? 'var(--neon-pink)'}`}
+												></div>
+											))}
+										</div>
+									</div>
+								)
+							}
+
+							{data.now_playing && (
+								<p class="mt-3 text-right font-mono text-[0.65rem] text-muted-foreground">live</p>
+							)}
+						</div>
+					</section>
+
+					{data.recent_tracks.length > 0 && (
+						<section>
+							<h2 class="mb-6 font-heading text-2xl font-bold tracking-tight text-foreground">
+								<span class="text-glow-cyan text-accent">{'>\u00A0'}</span>
+								Recently played
+							</h2>
+
+							<div class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+								{data.recent_tracks.map((track) => (
+									<div class="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-muted/40">
+										<AlbumArt
+											src={trackImage(track)}
+											class="size-10 shrink-0 rounded border border-border object-cover"
+											fallbackClass="flex size-10 shrink-0 items-center justify-center rounded bg-muted"
+											alt={`${track.name} album art`}
+											iconClass="size-4 text-muted-foreground"
+										/>
+
+										<div class="min-w-0 flex-1">
+											<p class="truncate text-sm font-medium text-foreground">{track.name}</p>
+											<p class="truncate font-mono text-xs text-muted-foreground">{track.artist.text}</p>
+										</div>
+
+										{track.formatted_time && (
+											<span class="shrink-0 font-mono text-xs text-muted-foreground">{track.formatted_time}</span>
+										)}
+
+										<a
+											href={track.url}
+											target="_blank"
+											rel="noreferrer"
+											class="shrink-0 text-xs text-muted-foreground transition-colors hover:text-accent"
+										>
+											↗
+										</a>
+									</div>
+								))}
+							</div>
+						</section>
+					)}
+				</>
+			)
+		}
+	</main>
+</SiteLayout>

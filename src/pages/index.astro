@@ -1,17 +1,40 @@
 ---
-
+import SiteLayout from '../layouts/SiteLayout.astro';
+import Hero from '../components/portfolio/Hero.astro';
+import CaseStudies from '../components/portfolio/CaseStudies.astro';
+import Projects from '../components/portfolio/Projects.astro';
+import Writing from '../components/portfolio/Writing.astro';
+import GitActivity from '../components/portfolio/GitActivity.astro';
+import NowPlaying from '../components/portfolio/NowPlaying.astro';
+import NowPlayingStats from '../components/portfolio/NowPlayingStats.astro';
+import Contact from '../components/portfolio/Contact.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<SiteLayout title="Sam Zanca — Full-Stack Engineer">
+	<main class="mx-auto max-w-3xl">
+		<Hero />
+		<CaseStudies />
+		<Projects />
+		<Writing />
+		<GitActivity />
+		<section id="music" class="px-4 py-12">
+			<p class="mb-6 font-mono text-sm text-muted-foreground">
+				I love listening to music while I work. Here's what I'm currently listening to:
+			</p>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+				<NowPlaying />
+				<NowPlayingStats />
+			</div>
+		</section>
+		<Contact />
+
+		<footer class="border-t border-border px-4 py-8">
+			<div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+				<p class="font-mono text-xs text-muted-foreground">
+					<span class="text-primary">$</span>
+					{" built with synthwave — © 2026 Sam"}
+				</p>
+			</div>
+		</footer>
+	</main>
+</SiteLayout>

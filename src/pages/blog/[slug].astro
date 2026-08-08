@@ -1,0 +1,53 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { postBySlug } from '../../data/blog';
+import { renderBlocks } from '../../data/content';
+
+const { slug } = Astro.params;
+const post = postBySlug(slug ?? '');
+
+let html = '';
+if (post) {
+	html = await renderBlocks(post.body, 'blog');
+}
+---
+
+<SiteLayout title={post ? post.frontmatter.title : 'Post not found'}>
+	{
+		post ? (
+			<article class="mx-auto max-w-3xl px-6 pb-24 pt-12">
+				<header class="mb-12">
+					<time class="mb-3 block font-mono text-sm text-muted-foreground" datetime={post.frontmatter.timestamp}>
+						{post.frontmatter.timestamp.split('T')[0] ?? post.frontmatter.timestamp}
+					</time>
+
+					<h1 class="text-glow-pink font-heading text-4xl font-extrabold leading-tight tracking-tight">
+						{post.frontmatter.title}
+					</h1>
+
+					{post.frontmatter.tags.length > 0 && (
+						<div class="mt-6 flex flex-wrap gap-2">
+							{post.frontmatter.tags.map((tag) => (
+								<span class="inline-flex items-center rounded-md border border-border bg-secondary px-2 py-0.5 font-mono text-xs text-secondary-foreground">
+									#{tag}
+								</span>
+							))}
+						</div>
+					)}
+				</header>
+
+				<div class="prose-content" set:html={html} />
+			</article>
+		) : (
+			<div class="flex items-center justify-center py-24">
+				<div class="text-center">
+					<h1 class="font-heading text-2xl text-foreground">Post not found</h1>
+					<p class="mt-2 text-muted-foreground">The post you're looking for doesn't exist or hasn't been published yet.</p>
+					<a href="/blog" class="mt-6 inline-block text-neon-cyan hover:underline">
+						Back to blog
+					</a>
+				</div>
+			</div>
+		)
+	}
+</SiteLayout>

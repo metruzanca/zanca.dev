@@ -1,0 +1,83 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+
+const SWATCHES: [string, string, string, string][] = [
+	['Primary', '--primary', 'bg-primary', 'Neon Magenta'],
+	['Accent', '--accent', 'bg-accent', 'Electric Cyan'],
+	['Violet', '--neon-purple', 'bg-neon-purple', 'Laser Violet'],
+	['Amber', '--neon-amber', 'bg-neon-amber', 'Sunset Amber'],
+	['Background', '--background', 'bg-background', 'Midnight'],
+	['Card', '--card', 'bg-card', 'Deep Indigo'],
+	['Muted', '--muted', 'bg-muted', 'Dusk'],
+	['Foreground', '--foreground', 'bg-foreground', 'Starlight'],
+];
+
+const TYPE_SCALE: [string, string, string][] = [
+	['Display', 'font-display text-5xl font-extrabold uppercase tracking-tight', 'Neon Drive'],
+	['Heading 1', 'font-display text-3xl font-bold uppercase', 'Retro Future'],
+	['Heading 2', 'font-display text-xl font-semibold uppercase', 'Grid Runner'],
+	['Body', 'text-base leading-relaxed', 'Cruising the highway at the edge of the simulation.'],
+	['Mono', 'font-mono text-sm', 'const speed = 88 // mph'],
+];
+---
+
+<div class="flex flex-col gap-16 px-4 py-12 md:px-8">
+	<section class="flex flex-col gap-6">
+		<SectionHeading
+			id="colors"
+			eyebrow="Foundations"
+			title="Colors"
+			description="A tight, high-contrast palette: vivid neon accents that glow against deep midnight surfaces. Every color is a CSS variable token."
+		/>
+		<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+			{SWATCHES.map(([name, token, bg, note]) => (
+				<div class="overflow-hidden rounded-lg border border-border bg-card">
+					<div class={`h-20 w-full ${bg}`}></div>
+					<div class="p-3">
+						<p class="text-sm font-medium text-foreground">{name}</p>
+						<p class="text-xs text-muted-foreground">{note}</p>
+						<p class="mt-1 font-mono text-[0.7rem] text-accent">{token}</p>
+					</div>
+				</div>
+			))}
+		</div>
+	</section>
+
+	<section class="flex flex-col gap-6">
+		<SectionHeading
+			id="typography"
+			eyebrow="Foundations"
+			title="Typography"
+			description="Orbitron drives the geometric, retro-arcade headings while Geist keeps body copy crisp and legible."
+		/>
+		<div class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+			{TYPE_SCALE.map(([name, cls, sample]) => (
+				<div class="flex flex-col gap-2 p-5 md:flex-row md:items-baseline md:gap-8">
+					<span class="w-24 shrink-0 font-mono text-xs uppercase tracking-widest text-muted-foreground">{name}</span>
+					<span class={`text-foreground ${cls}`}>{sample}</span>
+				</div>
+			))}
+		</div>
+	</section>
+
+	<section class="flex flex-col gap-6">
+		<SectionHeading
+			id="effects"
+			eyebrow="Foundations"
+			title="Effects"
+			description="Glow utilities and retro textures bring the scene to life — neon text shadows, box glows, perspective grids, and CRT scanlines."
+		/>
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<div class="flex h-32 items-center justify-center rounded-xl border border-border bg-card">
+				<span class="text-glow-pink font-display text-2xl font-bold uppercase text-primary">Pink Glow</span>
+			</div>
+			<div class="flex h-32 items-center justify-center rounded-xl border border-border bg-card">
+				<span class="text-glow-cyan font-display text-2xl font-bold uppercase text-accent">Cyan Glow</span>
+			</div>
+			<div class="synth-grid relative flex h-32 items-center justify-center overflow-hidden rounded-xl border border-border bg-card">
+				<div class="absolute inset-0 synth-scanlines"></div>
+				<span class="relative font-mono text-sm uppercase tracking-widest text-foreground">Grid + Scanlines</span>
+			</div>
+		</div>
+	</section>
+</div>

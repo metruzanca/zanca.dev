@@ -1,0 +1,40 @@
+---
+import { MusicNote } from '../ui/icons/index';
+
+interface Props {
+	src: string;
+	class: string;
+	fallbackClass: string;
+	alt: string;
+	iconClass: string;
+}
+
+const { src, class: cls, fallbackClass, alt, iconClass } = Astro.props;
+---
+
+{
+	src.length === 0 ? (
+		<div class={fallbackClass}>
+			<MusicNote class={iconClass} />
+		</div>
+	) : (
+		<div data-album-art>
+			<img src={src} alt={alt} class={cls} />
+			<div class={fallbackClass} style="display: none" data-album-art-fallback>
+				<MusicNote class={iconClass} />
+			</div>
+		</div>
+	)
+}
+
+<script>
+	document.querySelectorAll<HTMLElement>('[data-album-art]').forEach((root) => {
+		const img = root.querySelector<HTMLImageElement>('img');
+		const fallback = root.querySelector<HTMLElement>('[data-album-art-fallback]');
+		if (!img || !fallback) return;
+		img.addEventListener('error', () => {
+			img.style.display = 'none';
+			fallback.style.display = 'flex';
+		});
+	});
+</script>

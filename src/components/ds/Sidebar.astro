@@ -1,0 +1,51 @@
+---
+import { Triangle } from '../ui/icons/index';
+---
+
+<aside class="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-8 border-r border-border bg-sidebar px-5 py-6 lg:flex">
+	<a href="#overview" class="flex items-center gap-2.5">
+		<span class="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-glow-pink">
+			<Triangle class="size-4" />
+		</span>
+		<span class="font-display text-sm font-bold tracking-widest text-foreground">OUTRUN</span>
+	</a>
+
+	<nav class="flex flex-col gap-7">
+		<div class="flex flex-col gap-1.5">
+			<p class="px-2 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground">Foundations</p>
+			<ul class="flex flex-col gap-0.5">
+				<li>
+					<a href="#colors" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Colors</a>
+				</li>
+				<li>
+					<a href="#typography" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Typography</a>
+				</li>
+				<li>
+					<a href="#effects" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Effects</a>
+				</li>
+			</ul>
+		</div>
+		<div class="flex flex-col gap-1.5">
+			<p class="px-2 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground">Components</p>
+			<ul class="flex flex-col gap-0.5">
+				<li>
+					<a href="#buttons" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Buttons</a>
+				</li>
+				<li>
+					<a href="#badges" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Badges</a>
+				</li>
+				<li>
+					<a href="#inputs" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Inputs</a>
+				</li>
+				<li>
+					<a href="#cards" class="block rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-foreground">Cards</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="mt-auto rounded-lg border border-border bg-card/60 p-3">
+		<p class="font-mono text-[0.7rem] uppercase tracking-widest text-accent">v1.0 — Neon</p>
+		<p class="mt-1 text-xs leading-relaxed text-muted-foreground">A retro-futuristic design system for the digital frontier.</p>
+	</div>
+</aside>

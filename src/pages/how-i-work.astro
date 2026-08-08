@@ -1,0 +1,189 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout title="How I Work — Sam Zanca">
+	<main class="mx-auto max-w-3xl px-4 pb-24 pt-14 md:pt-20">
+		<header class="mb-12">
+			<h1 class="font-display text-4xl font-extrabold uppercase text-foreground md:text-6xl">
+				<span class="text-glow-cyan text-accent">{'> '}</span>
+				how I work
+			</h1>
+			<div class="mt-4 flex flex-wrap items-center gap-3 font-mono text-xs text-muted-foreground">
+				<span class="rounded-md border border-border px-2 py-0.5">Updated June 2026</span>
+			</div>
+			<p class="mt-4 max-w-xl font-mono text-sm text-muted-foreground">
+				Inspired by
+				<a href="https://den.dev/how-i-work/" target="_blank" rel="noreferrer" class="text-accent hover:underline">
+					Den Delimarsky
+				</a>
+				{' and '}
+				<a href="https://github.com/hepwori/wwi/" target="_blank" rel="noreferrer" class="text-accent hover:underline">
+					Isaac Hepworth
+				</a>
+				. This is a living document that describes how I operate—it's context for teammates, not a prescription for how you should work.
+			</p>
+			<p class="mt-2 font-mono text-xs text-muted-foreground">
+				Learn more{' '}
+				<a href="/about" class="text-accent hover:underline">about me</a>
+				.
+			</p>
+		</header>
+
+		<section class="mb-16">
+			<h2 class="mb-6 font-heading text-2xl font-bold tracking-tight text-foreground">
+				<span class="text-glow-pink text-primary">{'>\u00A0'}</span>
+				Principles
+			</h2>
+
+			<p class="mb-5 font-mono text-xs text-muted-foreground">
+				The ideas that guide how I approach building software and working with others.
+			</p>
+
+			<div class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+				<div class="px-6 py-5">
+					<h3 class="font-mono text-sm font-semibold text-accent">Ship in phases: work, pretty, fast.</h3>
+					<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+						First, get the infrastructure and data flowing correctly. Then layer in the UI and polish the experience. Finally, profile and optimize. Don't chase perfection up front—deliver value incrementally.
+					</p>
+				</div>
+				<div class="px-6 py-5">
+					<h3 class="font-mono text-sm font-semibold text-accent">Bias for action.</h3>
+					<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+						I'd rather build a quick prototype and learn from it than debate in the abstract. When there's disagreement, I build a proof-of-concept and put it in front of people. The best product wins, not my ego.
+					</p>
+				</div>
+				<div class="px-6 py-5">
+					<h3 class="font-mono text-sm font-semibold text-accent">UX and DX are the same thing.</h3>
+					<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+						A feature isn't done until both the end user and the next developer can use it. I care about clean APIs, clear error messages, and readable code as much as pixel-perfect interfaces.
+					</p>
+				</div>
+				<div class="px-6 py-5">
+					<h3 class="font-mono text-sm font-semibold text-accent">Feedback is how we get better.</h3>
+					<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+						I welcome direct feedback and give it in return. If something bothers me or has room for improvement, I'll have that conversation. Radical candor matters—be kind, but be clear.
+					</p>
+				</div>
+				<div class="px-6 py-5">
+					<h3 class="font-mono text-sm font-semibold text-accent">No blame, just prevent recurrence.</h3>
+					<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+						When things break, I run blameless postmortems. The goal isn't finding who broke what. It's understanding the chain of events, writing a test that catches it next time, and moving on. Systems fail, not people.
+					</p>
+				</div>
+				<div class="px-6 py-5">
+					<h3 class="font-mono text-sm font-semibold text-accent">Have fun solving problems.</h3>
+					<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+						Every project has something fun about it—a puzzle, a constraint, a chance to learn. I find that thing and lean into it. If I'm not learning, I'm stagnating.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-16">
+			<h2 class="mb-6 font-heading text-2xl font-bold tracking-tight text-foreground">
+				<span class="text-glow-pink text-primary">{'>\u00A0'}</span>
+				Notes
+			</h2>
+
+			<p class="mb-5 font-mono text-xs text-muted-foreground">
+				The practical stuff—how I communicate, structure my time, and prefer to collaborate.
+			</p>
+
+			<div class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+				<div class="px-6 py-4">
+					<p class="text-sm font-medium text-foreground">Communication</p>
+					<ul class="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-relaxed text-muted-foreground">
+						<li>Documentation takes precedence over meetings. If something isn't written down, it might as well not exist.</li>
+						<li>I set up meetings to hash out ideas and build partnerships—not for status updates. That can be async.</li>
+						<li>Before scheduling a meeting, ask: "Can I write this down and will it be useful for others?"</li>
+						<li>For business decisions, I prefer email or a shared doc—paper trails matter. For day-to-day coordination, whatever the team prefers.</li>
+						<li>Most email is not urgent. If something is truly urgent, reach out through faster channels.</li>
+						<li>I don't answer emails or attend meetings during vacation. I encourage the same.</li>
+					</ul>
+				</div>
+				<div class="px-6 py-4">
+					<p class="text-sm font-medium text-foreground">Focus and time</p>
+					<ul class="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-relaxed text-muted-foreground">
+						<li>Mornings are for deep work—creative tasks, complex problems. Afternoons are for reviews, emails, and coordination.</li>
+						<li>I work on a single monitor to reduce visual noise and stay in flow.</li>
+						<li>I work within a typical day. Evenings and weekends are for family, side projects, and recharging.</li>
+						<li>If you get an email from me late at night, I'm triaging my inbox—not expecting an immediate response.</li>
+						<li>I book regular time for self-development and encourage others to do the same.</li>
+					</ul>
+				</div>
+				<div class="px-6 py-4">
+					<p class="text-sm font-medium text-foreground">Shipping</p>
+					<ul class="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-relaxed text-muted-foreground">
+						<li>Before writing code, I clarify acceptance criteria. If it's not clear, I go ask. 5 minutes now saves a day of waste.</li>
+						<li>I prefer milestone-based work with defined scope. Smaller, shippable increments build trust and momentum.</li>
+						<li>Every incident gets a postmortem with concrete follow-ups that turn into actual tickets.</li>
+					</ul>
+				</div>
+				<div class="px-6 py-4">
+					<p class="text-sm font-medium text-foreground">Tooling</p>
+					<ul class="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-relaxed text-muted-foreground">
+						<li>
+							I live in the terminal. My editor is{' '}
+							<a href="https://zed.dev" target="_blank" rel="noreferrer" class="text-accent hover:underline">Zed</a>
+							—native, fast, no Electron. My AI coding tool is{' '}
+							<a href="https://github.com/anomalyco/opencode" target="_blank" rel="noreferrer" class="text-accent hover:underline">OpenCode</a>
+							, running locally with whatever model I want via OpenRouter.
+						</li>
+						<li>I use AI heavily for boilerplate, exploration, and parallel agents. But I write critical code by hand. If it touches billing, auth, or data integrity, I know every line.</li>
+						<li>I use git worktrees to juggle multiple features simultaneously. Each branch gets its own directory and mental space.</li>
+						<li>Compiled languages are a forcing function for quality. If it compiles, there's a lower chance of runtime surprises.</li>
+					</ul>
+				</div>
+				<div class="px-6 py-4">
+					<p class="text-sm font-medium text-foreground">Collaboration</p>
+					<ul class="mt-2 list-disc space-y-1.5 pl-4 text-sm leading-relaxed text-muted-foreground">
+						<li>I thrive in small teams where I wear multiple hats. I'd rather own a feature end-to-end than be siloed.</li>
+						<li>I don't micromanage. Once we've agreed on scope, I trust you to execute and will be here if you're blocked.</li>
+						<li>My door is always open. Blocked? Need clarification? Have a question? Ask me.</li>
+						<li>I value honesty, inclusiveness, and directness. If I'm missing the mark, call me out on it.</li>
+						<li>I have zero tolerance for toxicity. Rude or dismissive behavior doesn't fly.</li>
+						<li>Health and family always come first. Go take care of what matters. Work will be here when you're back.</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-16">
+			<h2 class="mb-6 font-heading text-2xl font-bold tracking-tight text-foreground">
+				<span class="text-glow-pink text-primary">{'>\u00A0'}</span>
+				Inspiration
+			</h2>
+
+			<p class="mb-5 font-mono text-xs text-muted-foreground">
+				Some of my favorite reads that shaped how I think about building software.
+			</p>
+
+			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				{
+					[
+						['Simplicity, Please', 'A manifesto for reducing complexity in software development.', 'https://www.infoq.com/articles/simplicity-manifesto-development/'],
+						['No Hello Club', 'Skip the pleasantries and get to the point in chat.', 'https://nohello.club/'],
+						['37signals', 'Opinionated takes on business, design, and staying small.', 'https://37signals.com/'],
+						['Software Craftsmanship', 'Raising the bar for professional software development. (Signed in 2021)', 'https://manifesto.softwarecraftsmanship.org/'],
+						['Agile Manifesto', 'The foundational document for agile software development.', 'https://agilemanifesto.org/'],
+					].map(([title, description, url]) => (
+						<a href={url} target="_blank" rel="noreferrer" class="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-accent/40">
+							<h3 class="font-mono text-sm font-semibold text-accent group-hover:underline">{title}</h3>
+							<p class="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
+						</a>
+					))
+				}
+			</div>
+		</section>
+
+		<footer class="border-t border-border px-4 py-8">
+			<div class="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+				<p class="font-mono text-xs text-muted-foreground">
+					<span class="text-primary">$</span>
+					{" built with synthwave — © 2026 Sam"}
+				</p>
+			</div>
+		</footer>
+	</main>
+</SiteLayout>

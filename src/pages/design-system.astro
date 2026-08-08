@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import DsSidebar from '../components/ds/Sidebar.astro';
+import DsTopbar from '../components/ds/Topbar.astro';
+import DsHero from '../components/ds/Hero.astro';
+import DsFoundations from '../components/ds/Foundations.astro';
+import DsComponentsShowcase from '../components/ds/ComponentsShowcase';
+---
+
+<Base title="Design System — Outrun Synthwave">
+	<div class="flex min-h-screen">
+		<DsSidebar />
+		<main class="flex min-w-0 flex-1 flex-col">
+			<DsTopbar />
+			<DsHero />
+			<div class="h-px bg-border"></div>
+			<DsFoundations />
+			<div class="h-px bg-border"></div>
+			<DsComponentsShowcase client:load />
+			<footer class="border-t border-border px-4 py-8 md:px-8">
+				<div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+					<p class="font-display text-sm font-bold uppercase tracking-widest text-foreground">Outrun</p>
+					<p class="font-mono text-xs text-muted-foreground">Synthwave Design System — built for the digital frontier</p>
+				</div>
+			</footer>
+		</main>
+	</div>
+</Base>

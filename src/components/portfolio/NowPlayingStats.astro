@@ -1,0 +1,26 @@
+---
+import { lastfmCache } from '../../data/lastfm';
+
+function renderScrobbles(count: number): string {
+	return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
+}
+
+const data = lastfmCache.get();
+---
+
+{
+	data && (
+		<a href="/music" class="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/50">
+			<div class="flex flex-row items-center justify-around gap-6">
+				<div class="flex flex-col">
+					<dt class="font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground">scrobbles</dt>
+					<dd class="mt-0.5 font-display text-2xl font-bold text-foreground">{renderScrobbles(data.total_scrobbles)}</dd>
+				</div>
+				<div class="flex flex-col">
+					<dt class="font-mono text-[0.65rem] uppercase tracking-wider text-muted-foreground">today</dt>
+					<dd class="mt-0.5 font-display text-2xl font-bold text-foreground">{data.scrobbles_today}</dd>
+				</div>
+			</div>
+		</a>
+	)
+}

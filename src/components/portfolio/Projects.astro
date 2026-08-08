@@ -1,0 +1,19 @@
+---
+import { githubCache } from '../../data/github';
+import ProjectCard from './ProjectCard.astro';
+
+const snapshot = githubCache.get();
+const pinned = snapshot?.pinned ?? [];
+---
+
+<section id="projects" class="px-4 py-12">
+	<div class="mb-6 flex items-center justify-end border-b border-border pb-2">
+		<a href="/projects" class="font-mono text-xs text-muted-foreground transition-colors hover:text-glow-cyan hover:text-accent">
+			all projects →
+		</a>
+	</div>
+
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+		{pinned.map((repo) => <ProjectCard repo={repo} />)}
+	</div>
+</section>

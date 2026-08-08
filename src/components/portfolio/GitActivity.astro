@@ -1,0 +1,79 @@
+---
+import { githubCache } from '../../data/github';
+import type { ContributionCell } from '../../data/github';
+
+const LEVEL_CLASSES = [
+	'bg-muted/40',
+	'bg-primary/30',
+	'bg-primary/55',
+	'bg-primary/80',
+	'bg-primary shadow-glow-pink',
+];
+
+function monthLabels(cells: ContributionCell[]): string[] {
+	if (cells.length === 0) return [];
+	const n = cells.length;
+	const step = Math.floor(n / 5);
+	const labels: string[] = [];
+	for (let i = 0; i < n; i += Math.max(step, 1)) {
+		const d = cells[i].date;
+		if (d.length >= 3) labels.push(d.slice(0, 3));
+		if (labels.length === 5) break;
+	}
+	const last = cells[cells.length - 1].date;
+	if (last.length >= 3) {
+		const lastLabel = last.slice(0, 3);
+		if (labels[labels.length - 1] !== lastLabel) labels.push(lastLabel);
+	}
+	return labels;
+}
+
+const snapshot = githubCache.get();
+const total = snapshot?.contributionTotal ?? 0;
+const cells = snapshot?.contributionCells ?? [];
+const months = monthLabels(cells);
+---
+
+<section id="activity" class="px-4 py-12">
+	<div class="rounded-xl border border-border bg-card p-5">
+		<div class="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+			<p class="text-sm text-foreground">
+				<span class="font-display text-xl font-bold text-primary">{total}</span>
+				{' '}
+				<span class="text-muted-foreground">contributions in the last year</span>
+			</p>
+			<span class="font-mono text-xs text-muted-foreground">
+				<a href="https://github.com/metruzanca" class="transition-colors hover:text-primary">
+					@metruzanca
+				</a>
+				{' on github'}
+			</span>
+		</div>
+
+		<div class="mb-1.5 flex justify-between font-mono text-[0.65rem] text-muted-foreground">
+			{months.map((month) => <span>{month}</span>)}
+		</div>
+
+		<div
+			class="grid gap-[2px]"
+			role="img"
+			aria-label={`GitHub contribution graph showing ${total} contributions over the last year`}
+			style="grid-template-columns: repeat(52, 1fr); grid-template-rows: repeat(7, 1fr); grid-auto-flow: column;"
+		>
+			{
+				cells.map((cell) => (
+					<span
+						class={`aspect-square rounded-[2px] ${LEVEL_CLASSES[cell.level]}`}
+						title={cell.count > 0 ? `${cell.count} contribution${cell.count === 1 ? '' : 's'} on ${cell.date}` : undefined}
+					></span>
+				))
+			}
+		</div>
+
+		<div class="mt-4 flex items-center justify-end gap-2 font-mono text-[0.65rem] text-muted-foreground">
+			<span>less</span>
+			{LEVEL_CLASSES.map((cls) => <span class={`size-2.5 rounded-[2px] ${cls}`}></span>)}
+			<span>more</span>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,42 @@
+---
+import type { ProjectPost } from '../../data/projects';
+import { formatFullDate } from '../../utils/datetime';
+
+interface Props {
+	project: ProjectPost;
+}
+
+const { project } = Astro.props;
+const fm = project.frontmatter;
+const date = formatFullDate(fm.timestamp);
+---
+
+<a
+	href={`/projects/${project.slug}`}
+	class="group block rounded-xl border border-border bg-card p-5 transition-colors hover:border-accent/50"
+>
+	<div class="flex items-baseline gap-4">
+		<time class="shrink-0 font-mono text-xs text-muted-foreground">{date}</time>
+		<div class="min-w-0 flex-1">
+			<h3 class="truncate font-display text-lg font-bold uppercase tracking-tight text-foreground transition-colors group-hover:text-accent">
+				{fm.title}
+			</h3>
+			{fm.company && <p class="mt-0.5 font-mono text-xs text-accent">{fm.company}</p>}
+		</div>
+		{fm.github.length > 0 && (
+			<span class="hidden shrink-0 font-mono text-xs text-muted-foreground sm:block">source →</span>
+		)}
+	</div>
+	{fm.description.length > 0 && (
+		<p class="mt-2 text-sm leading-relaxed text-muted-foreground">{fm.description}</p>
+	)}
+	{fm.tags.length > 0 && (
+		<div class="mt-3 flex flex-wrap gap-1.5">
+			{fm.tags.map((tag) => (
+				<span class="rounded-md border border-border/60 px-2 py-0.5 font-mono text-[0.65rem] text-muted-foreground">
+					#{tag}
+				</span>
+			))}
+		</div>
+	)}
+</a>
