@@ -8,7 +8,7 @@ interface Props {
 
 const { title = 'Sam Zanca — Full-Stack Engineer' } = Astro.props;
 const domain = siteDomain();
-const ogImage = `https://${domain}/assets/synthwave-horizon.png`;
+const ogImage = `https://${domain}/og-image.png`;
 ---
 
 <!doctype html>
@@ -16,7 +16,8 @@ const ogImage = `https://${domain}/assets/synthwave-horizon.png`;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" href="/assets/favicon.ico" />
+		<link rel="icon" type="image/png" href="/icon.png" />
+		<link rel="apple-touch-icon" href="/icon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
