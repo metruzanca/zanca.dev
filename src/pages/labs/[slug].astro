@@ -3,13 +3,15 @@ import SiteLayout from '../../layouts/SiteLayout.astro';
 import { labBySlug } from '../../components/labs/registry';
 import WordCount from '../../components/labs/WordCount';
 import Timezones from '../../components/labs/Timezones';
+import ColorSwatches from '../../components/labs/ColorSwatches';
 
 const { slug } = Astro.params;
 const lab = labBySlug(slug ?? '');
+const container = lab?.meta.wide ? 'max-w-5xl' : 'max-w-3xl';
 ---
 
 <SiteLayout title={lab ? `${lab.meta.name} — Labs` : 'Lab not found'}>
-	<main class="mx-auto max-w-3xl px-4 pb-12 pt-14 md:pt-20">
+	<main class={`mx-auto px-4 pb-12 pt-14 md:pt-20 ${container}`}>
 		{
 			lab ? (
 				<>
@@ -23,6 +25,7 @@ const lab = labBySlug(slug ?? '');
 					<div class="rounded-xl border border-border bg-card p-6">
 						{slug === 'word-count' && <WordCount client:only="solid" />}
 						{slug === 'tz' && <Timezones client:only="solid" />}
+						{slug === 'color-swatches' && <ColorSwatches client:only="solid" />}
 					</div>
 				</>
 			) : (

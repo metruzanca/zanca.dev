@@ -1,12 +1,14 @@
 import type { Component } from 'solid-js';
 import WordCount from './WordCount';
 import Timezones from './Timezones';
+import ColorSwatches from './ColorSwatches';
 
 export interface LabMeta {
 	slug: string;
 	name: string;
 	description: string;
 	tags: string[];
+	wide?: boolean;
 }
 
 export interface LabInfo {
@@ -32,6 +34,16 @@ export const labs: LabInfo[] = [
 			tags: ['tool', 'time', 'calendar'],
 		},
 		component: Timezones,
+	},
+	{
+		meta: {
+			slug: 'color-swatches',
+			name: 'Color Swatches',
+			description: 'Pick a color, edit it in any format (hex, rgb, hsl, hwb), and organize swatches into shareable groups.',
+			tags: ['tool', 'design', 'color'],
+			wide: true,
+		},
+		component: ColorSwatches,
 	},
 ];
 
