@@ -74,18 +74,9 @@ function rgbToHex(rgb: RGB): string {
 	return `#${to(rgb.r)}${to(rgb.g)}${to(rgb.b)}`;
 }
 
-function rgbToHsl(rgb: RGB): { h: number; s: number; l: number } {
-	const r = rgb.r / 255;
-	const g = rgb.g / 255;
-	const b = rgb.b / 255;
-	const max = Math.max(r, g, b);
-	const min = Math.min(r, g, b);
+function hueFromRgb(r: number, g: number, b: number, max: number, d: number): number {
 	let h = 0;
-	let s = 0;
-	const l = (max + min) / 2;
-	const d = max - min;
 	if (d !== 0) {
-		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 		switch (max) {
 			case r:
 				h = (g - b) / d + (g < b ? 6 : 0);
@@ -98,7 +89,22 @@ function rgbToHsl(rgb: RGB): { h: number; s: number; l: number } {
 		}
 		h *= 60;
 	}
-	return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+	return Math.round(h);
+}
+
+function rgbToHsl(rgb: RGB): { h: number; s: number; l: number } {
+	const r = rgb.r / 255;
+	const g = rgb.g / 255;
+	const b = rgb.b / 255;
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+	const l = (max + min) / 2;
+	const d = max - min;
+	let s = 0;
+	if (d !== 0) {
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+	}
+	return { h: hueFromRgb(r, g, b, max, d), s: Math.round(s * 100), l: Math.round(l * 100) };
 }
 
 function hslToRgb(h: number, s: number, l: number): RGB {
@@ -133,22 +139,8 @@ function rgbToHsv(rgb: RGB): { h: number; s: number; v: number } {
 	const max = Math.max(r, g, b);
 	const min = Math.min(r, g, b);
 	const d = max - min;
-	let h = 0;
-	if (d !== 0) {
-		switch (max) {
-			case r:
-				h = (g - b) / d + (g < b ? 6 : 0);
-				break;
-			case g:
-				h = (b - r) / d + 2;
-				break;
-			default:
-				h = (r - g) / d + 4;
-		}
-		h *= 60;
-	}
 	const s = max === 0 ? 0 : d / max;
-	return { h: Math.round(h), s, v: max };
+	return { h: hueFromRgb(r, g, b, max, d), s, v: max };
 }
 
 function hsvToRgb(h: number, s: number, v: number): RGB {
@@ -307,10 +299,20 @@ function normalizeGroups(raw: unknown): Group[] {
 	return [favorites, ...others];
 }
 
+function parseHistory(raw: unknown): string[] {
+	return Array.isArray(raw)
+		? (raw as unknown[]).filter((h): h is string => typeof h === 'string' && !!hexToRgb(h))
+		: [];
+}
+
+function zancaDevGroup(): Group {
+	return { id: ZANCA_DEV_ID, name: 'zanca-dev', colors: ZANCA_DEV_COLORS };
+}
+
 function defaultGroups(): Group[] {
 	return [
 		{ id: FAVORITES_ID, name: 'favorites', colors: [] },
-		{ id: ZANCA_DEV_ID, name: 'zanca-dev', colors: ZANCA_DEV_COLORS },
+		zancaDevGroup(),
 	];
 }
 
@@ -323,27 +325,13 @@ function loadState(): PersistState {
 		const current = localStorage.getItem(STORAGE_KEY);
 		if (current) {
 			const parsed = JSON.parse(current) as Record<string, unknown>;
-			const history = Array.isArray(parsed.history)
-				? (parsed.history as unknown[]).filter(
-						(h): h is string => typeof h === 'string' && !!hexToRgb(h),
-					)
-				: [];
-			return { history, groups: normalizeGroups(parsed.groups) };
+			return { history: parseHistory(parsed.history), groups: normalizeGroups(parsed.groups) };
 		}
 		const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
 		if (legacy) {
 			const parsed = JSON.parse(legacy) as Record<string, unknown>;
-			const history = Array.isArray(parsed.history)
-				? (parsed.history as unknown[]).filter(
-						(h): h is string => typeof h === 'string' && !!hexToRgb(h),
-					)
-				: [];
-			const groups = ensureGroup(normalizeGroups(parsed.groups), {
-				id: ZANCA_DEV_ID,
-				name: 'zanca-dev',
-				colors: ZANCA_DEV_COLORS,
-			});
-			return { history, groups };
+			const groups = ensureGroup(normalizeGroups(parsed.groups), zancaDevGroup());
+			return { history: parseHistory(parsed.history), groups };
 		}
 	} catch {
 		// fall through to defaults
@@ -352,27 +340,13 @@ function loadState(): PersistState {
 }
 
 function parseShareParams(): { group: string; colors: string[] } {
-	const search = window.location.search.replace(/^\?/, '');
-	let group = '';
+	const params = new URLSearchParams(window.location.search);
 	const colors: string[] = [];
-	for (const pair of search.split('&').filter((s) => s.length > 0)) {
-		const idx = pair.indexOf('=');
-		const key = idx === -1 ? pair : pair.slice(0, idx);
-		const val = idx === -1 ? '' : pair.slice(idx + 1);
-		if (key === 'group') {
-			try {
-				group = decodeURIComponent(val);
-			} catch {
-				group = val;
-			}
-		} else if (key === 'c') {
-			for (const raw of val.split(',')) {
-				const hex = `#${raw.trim().replace(/^#/, '')}`;
-				if (hexToRgb(hex) && !colors.includes(hex.toLowerCase())) colors.push(hex.toLowerCase());
-			}
-		}
+	for (const raw of (params.get('c') ?? '').split(',')) {
+		const hex = `#${raw.trim().replace(/^#/, '')}`;
+		if (hexToRgb(hex) && !colors.includes(hex.toLowerCase())) colors.push(hex.toLowerCase());
 	}
-	return { group: group.trim(), colors };
+	return { group: (params.get('group') ?? '').trim(), colors };
 }
 
 // ── Small UI pieces ──────────────────────────────────────────────────────
@@ -416,32 +390,32 @@ function FormatField(props: {
 	};
 
 	return (
-		<div class="rounded-xl border border-border bg-background/60 p-4">
-			<div class="mb-1 flex items-center justify-between">
-				<h3 class="font-mono text-xs font-semibold uppercase tracking-widest text-accent">
-					{props.label}
-				</h3>
+		<div class="flex items-center gap-2">
+			<span class="w-10 shrink-0 font-mono text-[10px] font-semibold uppercase tracking-widest text-accent">
+				{props.label}
+			</span>
+			<div class="relative flex-1">
+				<input
+					class="h-9 w-full rounded-md border border-input bg-background pr-16 pl-2.5 font-mono text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:shadow-glow-pink"
+					value={draft()}
+					spellcheck={false}
+					onInput={(e) => {
+						editing = true;
+						setDraft(e.currentTarget.value);
+					}}
+					onBlur={commit}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') e.currentTarget.blur();
+					}}
+				/>
 				<button
 					type="button"
-					class="font-mono text-[10px] uppercase tracking-widest text-accent transition-colors hover:text-primary"
+					class="absolute top-1/2 right-1 flex h-7 -translate-y-1/2 items-center rounded-md px-2 font-mono text-[10px] uppercase tracking-widest text-accent transition-colors hover:bg-muted hover:text-primary"
 					onClick={props.onCopy}
 				>
 					{props.copied ? 'Copied' : 'Copy'}
 				</button>
 			</div>
-			<input
-				class="h-9 w-full rounded-md border border-input bg-background px-2.5 font-mono text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:shadow-glow-pink"
-				value={draft()}
-				spellcheck={false}
-				onInput={(e) => {
-					editing = true;
-					setDraft(e.currentTarget.value);
-				}}
-				onBlur={commit}
-				onKeyDown={(e) => {
-					if (e.key === 'Enter') e.currentTarget.blur();
-				}}
-			/>
 		</div>
 	);
 }
@@ -604,7 +578,7 @@ function Swatch(props: {
 
 function GroupCard(props: {
 	group: Group;
-	isFavorites: boolean;
+	isProtected: boolean;
 	isSelected: boolean;
 	dragOver: boolean;
 	favorites: Set<string>;
@@ -645,7 +619,7 @@ function GroupCard(props: {
 					>
 						Share
 					</button>
-					<Show when={!props.isFavorites}>
+					<Show when={!props.isProtected}>
 						<button
 							type="button"
 							class="flex size-6 items-center justify-center rounded-md border border-border font-mono text-xs text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
@@ -724,6 +698,28 @@ const ColorSwatches = () => {
 		() => new Set(groups().find((g) => g.id === FAVORITES_ID)?.colors ?? []),
 	);
 
+	const setColorPreview = (hex: string): string | null => {
+		const norm = hexToRgb(hex) ? hex : null;
+		if (norm) setColorSignal(norm);
+		return norm;
+	};
+
+	const pushHistory = (norm: string) => {
+		setHistory((h) => {
+			if (h[h.length - 1] === norm) return h;
+			const next = [...h, norm];
+			return next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
+		});
+	};
+
+	const setColor = (hex: string, immediate = false) => {
+		const norm = setColorPreview(hex);
+		if (!norm) return;
+		window.clearTimeout(historyTimer);
+		if (immediate) pushHistory(norm);
+		else historyTimer = window.setTimeout(() => pushHistory(norm), HISTORY_DEBOUNCE_MS);
+	};
+
 	onMount(() => {
 		const state = loadState();
 		setHistory(state.history);
@@ -747,13 +743,7 @@ const ColorSwatches = () => {
 				setSelectedGroup(created.id);
 			}
 			setGroups(gs);
-			setHistory((h) => {
-				const next = [...h];
-				for (const c of colors) {
-					if (next[next.length - 1] !== c) next.push(c);
-				}
-				return next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
-			});
+			for (const c of colors) pushHistory(c);
 		} else if (state.groups.length > 0) {
 			setSelectedGroup(state.groups[0].id);
 		}
@@ -772,36 +762,6 @@ const ColorSwatches = () => {
 			}
 		}, SAVE_DEBOUNCE_MS);
 	});
-
-	const setColorPreview = (hex: string) => {
-		const norm = hexToRgb(hex) ? hex : null;
-		if (!norm) return;
-		setColorSignal(norm);
-	};
-
-	const pushHistory = (norm: string) => {
-		setHistory((h) => {
-			if (h[h.length - 1] === norm) return h;
-			const next = [...h, norm];
-			return next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
-		});
-	};
-
-	const setColor = (hex: string) => {
-		const norm = hexToRgb(hex) ? hex : null;
-		if (!norm) return;
-		setColorPreview(norm);
-		window.clearTimeout(historyTimer);
-		historyTimer = window.setTimeout(() => pushHistory(norm), HISTORY_DEBOUNCE_MS);
-	};
-
-	const setColorNow = (hex: string) => {
-		const norm = hexToRgb(hex) ? hex : null;
-		if (!norm) return;
-		setColorPreview(norm);
-		window.clearTimeout(historyTimer);
-		pushHistory(norm);
-	};
 
 	const showToast = (msg: string) => {
 		setToast(msg);
@@ -877,7 +837,7 @@ const ColorSwatches = () => {
 
 	const onSliderRelease = () => {
 		const cur = color();
-		if (cur) setColorNow(cur);
+		if (cur) setColor(cur, true);
 	};
 
 	// ── Group handlers ──────────────────────────────────────────────────
@@ -899,7 +859,7 @@ const ColorSwatches = () => {
 	};
 
 	const deleteGroup = (id: string) => {
-		if (id === FAVORITES_ID) return;
+		if (id === FAVORITES_ID || id === ZANCA_DEV_ID) return;
 		setGroups((gs) => gs.filter((g) => g.id !== id));
 		if (selectedGroup() === id) setSelectedGroup(FAVORITES_ID);
 	};
@@ -953,28 +913,13 @@ const ColorSwatches = () => {
 	return (
 		<div class="space-y-6">
 			{/* Picker + formats */}
-			<div class="grid gap-6 lg:grid-cols-[260px_1fr]">
-				<div class="space-y-3">
+			<div class="flex flex-col items-center gap-6 lg:flex-row lg:justify-center">
+				<div class="w-full max-w-[260px] space-y-3">
 					<SvBox color={rgb()} onSelect={onSvSelect} onRelease={onSliderRelease} />
 					<HueSlider hue={hsv().h} onSelect={onHueSelect} onRelease={onSliderRelease} />
-					<label
-						class="flex h-9 w-full cursor-pointer items-center gap-2 rounded-lg border border-border bg-background px-2.5"
-						title="System color picker"
-					>
-						<span class="relative block h-6 w-6 shrink-0 overflow-hidden rounded border border-border">
-							<input
-								type="color"
-								value={color()}
-								onInput={(e) => setColor(e.currentTarget.value)}
-								class="absolute -inset-1 size-full cursor-pointer border-0 bg-transparent"
-								aria-label="System color picker"
-							/>
-						</span>
-						<span class="font-mono text-xs text-muted-foreground">System picker</span>
-					</label>
 				</div>
 
-				<div class="grid gap-4 sm:grid-cols-2">
+				<div class="w-full max-w-md space-y-3">
 					<FormatField
 						label="HEX"
 						value={color().toUpperCase()}
@@ -1003,6 +948,21 @@ const ColorSwatches = () => {
 						copied={copied() === 'hwb'}
 						onCopy={() => copyValue('hwb', formatHwbString(hwb()))}
 					/>
+					<label
+						class="flex h-9 w-full cursor-pointer items-center gap-2 rounded-lg border border-border bg-background px-2.5"
+						title="System color picker"
+					>
+						<span class="relative block h-6 w-6 shrink-0 overflow-hidden rounded border border-border">
+							<input
+								type="color"
+								value={color()}
+								onInput={(e) => setColor(e.currentTarget.value)}
+								class="absolute -inset-1 size-full cursor-pointer border-0 bg-transparent"
+								aria-label="System color picker"
+							/>
+						</span>
+						<span class="font-mono text-xs text-muted-foreground">System picker</span>
+					</label>
 				</div>
 			</div>
 
@@ -1061,7 +1021,7 @@ const ColorSwatches = () => {
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') createGroup();
 							}}
-							placeholder="New group (a-z, 0-9, -_)"
+							placeholder="my-colors"
 							class="h-8 w-44 rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-accent focus:shadow-glow-cyan"
 						/>
 						<Button variant="outline" size="sm" onClick={createGroup}>
@@ -1074,7 +1034,7 @@ const ColorSwatches = () => {
 					{groups().map((g) => (
 						<GroupCard
 							group={g}
-							isFavorites={g.id === FAVORITES_ID}
+							isProtected={g.id === FAVORITES_ID || g.id === ZANCA_DEV_ID}
 							isSelected={selectedGroup() === g.id}
 							dragOver={dragOverId() === g.id}
 							favorites={favoritesSet()}
