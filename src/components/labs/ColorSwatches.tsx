@@ -132,53 +132,6 @@ function hslToRgb(h: number, s: number, l: number): RGB {
 	};
 }
 
-function rgbToHsv(rgb: RGB): { h: number; s: number; v: number } {
-	const r = rgb.r / 255;
-	const g = rgb.g / 255;
-	const b = rgb.b / 255;
-	const max = Math.max(r, g, b);
-	const min = Math.min(r, g, b);
-	const d = max - min;
-	const s = max === 0 ? 0 : d / max;
-	return { h: hueFromRgb(r, g, b, max, d), s, v: max };
-}
-
-function hsvToRgb(h: number, s: number, v: number): RGB {
-	const hh = (((h % 360) + 360) % 360) / 60;
-	const ss = clamp01(s);
-	const vv = clamp01(v);
-	const c = vv * ss;
-	const x = c * (1 - Math.abs((hh % 2) - 1));
-	const m = vv - c;
-	let r = 0;
-	let g = 0;
-	let b = 0;
-	if (hh < 1) {
-		r = c;
-		g = x;
-	} else if (hh < 2) {
-		r = x;
-		g = c;
-	} else if (hh < 3) {
-		g = c;
-		b = x;
-	} else if (hh < 4) {
-		g = x;
-		b = c;
-	} else if (hh < 5) {
-		r = x;
-		b = c;
-	} else {
-		r = c;
-		b = x;
-	}
-	return {
-		r: Math.round((r + m) * 255),
-		g: Math.round((g + m) * 255),
-		b: Math.round((b + m) * 255),
-	};
-}
-
 function rgbToHwb(rgb: RGB): { h: number; w: number; b: number } {
 	const h = rgbToHsl(rgb).h;
 	const r = rgb.r / 255;
@@ -420,101 +373,60 @@ function FormatField(props: {
 	);
 }
 
-function SvBox(props: {
-	color: RGB;
-	onSelect: (s: number, v: number) => void;
+function HslSlider(props: {
+	label: string;
+	value: number;
+	max: number;
+	gradient: string;
+	onSelect: (v: number) => void;
 	onRelease: () => void;
 }) {
 	let ref: HTMLDivElement | undefined;
 	let dragging = false;
 
-	const hsv = createMemo(() => rgbToHsv(props.color));
-	const hue = () => hsv().h;
-
 	const update = (e: PointerEvent) => {
 		const el = ref;
 		if (!el) return;
 		const rect = el.getBoundingClientRect();
-		const x = clamp01((e.clientX - rect.left) / rect.width);
-		const y = clamp01((e.clientY - rect.top) / rect.height);
-		props.onSelect(x, 1 - y);
+		const v = Math.round(clamp01((e.clientX - rect.left) / rect.width) * props.max);
+		props.onSelect(v);
 	};
 
 	return (
-		<div
-			ref={ref}
-			class="relative h-44 w-full cursor-crosshair touch-none select-none overflow-hidden rounded-lg border border-border"
-			style={{
-				background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, hsl(${hue()} 100% 50%), #fff)`,
-			}}
-			onPointerDown={(e) => {
-				dragging = true;
-				e.currentTarget.setPointerCapture(e.pointerId);
-				update(e);
-			}}
-			onPointerMove={(e) => {
-				if (dragging) update(e);
-			}}
-			onPointerUp={(e) => {
-				dragging = false;
-				try {
-					e.currentTarget.releasePointerCapture(e.pointerId);
-				} catch {
-					// ignore
-				}
-				props.onRelease();
-			}}
-		>
+		<div class="flex items-center gap-2">
+			<span class="w-10 shrink-0 font-mono text-[10px] font-semibold uppercase tracking-widest text-accent">
+				{props.label}
+			</span>
 			<div
-				class="pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md"
-				style={{ left: `${hsv().s * 100}%`, top: `${(1 - hsv().v) * 100}%` }}
-			/>
-		</div>
-	);
-}
-
-function HueSlider(props: { hue: number; onSelect: (h: number) => void; onRelease: () => void }) {
-	let ref: HTMLDivElement | undefined;
-	let dragging = false;
-
-	const update = (e: PointerEvent) => {
-		const el = ref;
-		if (!el) return;
-		const rect = el.getBoundingClientRect();
-		const h = Math.round(clamp01((e.clientX - rect.left) / rect.width) * 360);
-		props.onSelect(h);
-	};
-
-	return (
-		<div
-			ref={ref}
-			class="relative h-4 w-full cursor-ew-resize touch-none select-none rounded-full border border-border"
-			style={{
-				background:
-					'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)',
-			}}
-			onPointerDown={(e) => {
-				dragging = true;
-				e.currentTarget.setPointerCapture(e.pointerId);
-				update(e);
-			}}
-			onPointerMove={(e) => {
-				if (dragging) update(e);
-			}}
-			onPointerUp={(e) => {
-				dragging = false;
-				try {
-					e.currentTarget.releasePointerCapture(e.pointerId);
-				} catch {
-					// ignore
-				}
-				props.onRelease();
-			}}
-		>
-			<div
-				class="pointer-events-none absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md"
-				style={{ left: `${props.hue / 360 * 100}%` }}
-			/>
+				ref={ref}
+				class="relative h-4 w-full cursor-ew-resize touch-none select-none rounded-full border border-border"
+				style={{ background: props.gradient }}
+				onPointerDown={(e) => {
+					dragging = true;
+					e.currentTarget.setPointerCapture(e.pointerId);
+					update(e);
+				}}
+				onPointerMove={(e) => {
+					if (dragging) update(e);
+				}}
+				onPointerUp={(e) => {
+					dragging = false;
+					try {
+						e.currentTarget.releasePointerCapture(e.pointerId);
+					} catch {
+						// ignore
+					}
+					props.onRelease();
+				}}
+			>
+				<div
+					class="pointer-events-none absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md ring-1 ring-black/25"
+					style={{ left: `${(props.value / props.max) * 100}%` }}
+				/>
+			</div>
+			<span class="w-9 shrink-0 text-right font-mono text-[10px] text-muted-foreground">
+				{props.value}
+			</span>
 		</div>
 	);
 }
@@ -693,7 +605,6 @@ const ColorSwatches = () => {
 	const rgb = createMemo(() => hexToRgb(color()) ?? { r: 0, g: 0, b: 0 });
 	const hsl = createMemo(() => rgbToHsl(rgb()));
 	const hwb = createMemo(() => rgbToHwb(rgb()));
-	const hsv = createMemo(() => rgbToHsv(rgb()));
 	const favoritesSet = createMemo(
 		() => new Set(groups().find((g) => g.id === FAVORITES_ID)?.colors ?? []),
 	);
@@ -827,12 +738,16 @@ const ColorSwatches = () => {
 		return true;
 	};
 
-	const onSvSelect = (s: number, v: number) => {
-		setColorPreview(rgbToHex(hsvToRgb(hsv().h, s, v)));
+	const onHueSelect = (h: number) => {
+		setColorPreview(rgbToHex(hslToRgb(h, hsl().s, hsl().l)));
 	};
 
-	const onHueSelect = (h: number) => {
-		setColorPreview(rgbToHex(hsvToRgb(h, hsv().s, hsv().v)));
+	const onSatSelect = (s: number) => {
+		setColorPreview(rgbToHex(hslToRgb(hsl().h, s, hsl().l)));
+	};
+
+	const onLightSelect = (l: number) => {
+		setColorPreview(rgbToHex(hslToRgb(hsl().h, hsl().s, l)));
 	};
 
 	const onSliderRelease = () => {
@@ -915,8 +830,30 @@ const ColorSwatches = () => {
 			{/* Picker + formats */}
 			<div class="flex flex-col items-center gap-6 lg:flex-row lg:justify-center">
 				<div class="w-full max-w-[260px] space-y-3">
-					<SvBox color={rgb()} onSelect={onSvSelect} onRelease={onSliderRelease} />
-					<HueSlider hue={hsv().h} onSelect={onHueSelect} onRelease={onSliderRelease} />
+					<HslSlider
+						label="Hue"
+						value={hsl().h}
+						max={360}
+						gradient="linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)"
+						onSelect={onHueSelect}
+						onRelease={onSliderRelease}
+					/>
+					<HslSlider
+						label="Sat"
+						value={hsl().s}
+						max={100}
+						gradient={`linear-gradient(to right, hsl(${hsl().h} 0% ${hsl().l}%), hsl(${hsl().h} 100% ${hsl().l}%))`}
+						onSelect={onSatSelect}
+						onRelease={onSliderRelease}
+					/>
+					<HslSlider
+						label="Lgt"
+						value={hsl().l}
+						max={100}
+						gradient={`linear-gradient(to right, hsl(${hsl().h} ${hsl().s}% 0%), hsl(${hsl().h} ${hsl().s}% 50%), hsl(${hsl().h} ${hsl().s}% 100%))`}
+						onSelect={onLightSelect}
+						onRelease={onSliderRelease}
+					/>
 				</div>
 
 				<div class="w-full max-w-md space-y-3">
