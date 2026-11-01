@@ -22,7 +22,7 @@ export default defineConfig({
 			'astro:build:done': async ({ dir }) => {
 				// Make markdown content available to the standalone SSR server.
 				const root = join(dir.pathname, '..');
-				for (const sub of ['blog', 'projects']) {
+				for (const sub of ['blog', 'projects', 'talks']) {
 					const src = join(process.cwd(), 'content', sub);
 					const dest = join(root, 'content', sub);
 					let files;

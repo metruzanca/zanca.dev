@@ -4,6 +4,7 @@ import Hero from '../components/portfolio/Hero.astro';
 import CaseStudies from '../components/portfolio/CaseStudies.astro';
 import Projects from '../components/portfolio/Projects.astro';
 import Writing from '../components/portfolio/Writing.astro';
+import Talks from '../components/portfolio/Talks.astro';
 import GitActivity from '../components/portfolio/GitActivity.astro';
 import NowPlaying from '../components/portfolio/NowPlaying.astro';
 import NowPlayingStats from '../components/portfolio/NowPlayingStats.astro';
@@ -19,6 +20,7 @@ if (!lastfmCache.get()) await lastfmCache.refresh();
 		<CaseStudies />
 		<Projects />
 		<Writing />
+		<Talks />
 		<GitActivity />
 		<section id="music" class="px-4 py-12">
 			<p class="mb-6 font-mono text-sm text-muted-foreground">

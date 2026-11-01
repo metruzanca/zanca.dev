@@ -43,3 +43,20 @@ export function formatMonthYear(iso: string): string {
 	const year = iso.slice(0, 4);
 	return `${month} ${year}`;
 }
+
+/**
+ * Today's calendar date ("YYYY-MM-DD") in the given IANA timezone.
+ * Used so date-derived state (e.g. talk status) flips at local midnight
+ * rather than at the server's midnight.
+ */
+export function todayInZone(timeZone: string): string {
+	const parts = new Intl.DateTimeFormat('en-US', {
+		timeZone,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	}).formatToParts(new Date());
+
+	const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+	return `${get('year')}-${get('month')}-${get('day')}`;
+}

@@ -4,6 +4,7 @@ import Nav from '../components/portfolio/Nav.astro';
 import CommandPalette from '../components/CommandPalette';
 import { publishedPosts } from '../data/blog';
 import { allProjects } from '../data/projects';
+import { allTalks } from '../data/talks';
 import { labs } from '../components/labs/registry';
 import type { CommandPageItem } from '../components/CommandPalette';
 
@@ -36,6 +37,12 @@ const items: CommandPageItem[] = [
 		title: 'Labs',
 		description: 'Small tools, experiments, and utilities',
 		url: '/labs',
+		section: 'Navigation',
+	},
+	{
+		title: 'Talks',
+		description: 'Conference talks and presentations',
+		url: '/talks',
 		section: 'Navigation',
 	},
 	{
@@ -85,6 +92,18 @@ for (const project of allProjects()) {
 		description: desc,
 		url: `/projects/${project.slug}`,
 		section: 'Case Studies',
+	});
+}
+
+for (const talk of allTalks()) {
+	const desc = talk.frontmatter.event
+		? `${talk.frontmatter.event} — ${talk.frontmatter.description}`
+		: talk.frontmatter.description;
+	items.push({
+		title: talk.frontmatter.title,
+		description: desc,
+		url: `/talks/${talk.slug}`,
+		section: 'Talks',
 	});
 }
 ---

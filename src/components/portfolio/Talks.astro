@@ -1,0 +1,24 @@
+---
+import { upcomingTalks, pastTalks } from '../../data/talks';
+import TalkCard from './TalkCard.astro';
+
+const upcoming = upcomingTalks();
+const mostRecentPast = pastTalks()[0];
+const talks = upcoming.length > 0 ? upcoming.slice(0, 2) : mostRecentPast ? [mostRecentPast] : [];
+---
+
+{
+	talks.length > 0 && (
+		<section id="talks" class="px-4 py-12">
+			<div class="mb-6 flex items-center justify-end border-b border-border pb-2">
+				<a href="/talks" class="font-mono text-xs text-muted-foreground transition-colors hover:text-glow-cyan hover:text-accent">
+					all talks →
+				</a>
+			</div>
+
+			<div class="grid grid-cols-1 gap-4">
+				{talks.map((talk) => <TalkCard talk={talk} />)}
+			</div>
+		</section>
+	)
+}

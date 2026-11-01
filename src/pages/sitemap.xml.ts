@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { siteDomain } from '../env';
 import { getMergedPosts } from '../data/blog';
 import { allProjects } from '../data/projects';
+import { allTalks } from '../data/talks';
 import { labs } from '../components/labs/registry';
 
 export const GET: APIRoute = () => {
@@ -15,6 +16,7 @@ export const GET: APIRoute = () => {
 		'/projects',
 		'/blog',
 		'/labs',
+		'/talks',
 		'/music',
 		'/resume',
 		'/design-system',
@@ -22,6 +24,7 @@ export const GET: APIRoute = () => {
 
 	for (const post of getMergedPosts()) paths.add(`/blog/${post.slug}`);
 	for (const project of allProjects()) paths.add(`/projects/${project.slug}`);
+	for (const talk of allTalks()) paths.add(`/talks/${talk.slug}`);
 	for (const lab of labs) paths.add(`/labs/${lab.meta.slug}`);
 
 	const urls = [...paths]

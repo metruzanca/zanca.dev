@@ -1,0 +1,25 @@
+---
+import type { TalkStatus } from '../../data/talks';
+
+interface Props {
+	status: TalkStatus;
+}
+
+const { status } = Astro.props;
+
+const label = status === 'today' ? 'today' : status === 'upcoming' ? 'upcoming' : 'past';
+
+const classes =
+	status === 'today'
+		? 'border-primary/50 text-primary shadow-glow-pink'
+		: status === 'upcoming'
+			? 'border-accent/40 text-accent'
+			: 'border-border/60 text-muted-foreground';
+---
+
+<span
+	class={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-wider ${classes}`}
+>
+	<span class="size-1.5 rounded-full bg-current"></span>
+	{label}
+</span>

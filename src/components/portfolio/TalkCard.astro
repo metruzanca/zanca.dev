@@ -1,0 +1,60 @@
+---
+import type { Talk } from '../../data/talks';
+import { talkStatus } from '../../data/talks';
+import { formatFullDate } from '../../utils/datetime';
+import { MapPin } from '../ui/icons/index';
+import TalkStatusBadge from './TalkStatusBadge.astro';
+
+interface Props {
+	talk: Talk;
+}
+
+const { talk } = Astro.props;
+const fm = talk.frontmatter;
+const status = talkStatus(talk);
+const date = formatFullDate(fm.date);
+
+function tagAccent(index: number): string {
+	return index % 2 === 0 ? 'primary' : 'cyan';
+}
+
+function tagClasses(accent: string): string {
+	return accent === 'cyan'
+		? 'rounded-md border px-2 py-0.5 font-mono text-[0.7rem] border-accent/40 text-accent'
+		: 'rounded-md border px-2 py-0.5 font-mono text-[0.7rem] border-primary/40 text-primary';
+}
+---
+
+<a
+	href={`/talks/${talk.slug}`}
+	class="group block rounded-xl border border-border bg-card p-5 transition-colors hover:border-accent/50"
+>
+	<div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+		<TalkStatusBadge status={status} />
+		<time class="font-mono text-xs text-muted-foreground" datetime={fm.date}>{date}</time>
+	</div>
+
+	<h3 class="font-display text-lg font-bold uppercase tracking-tight text-foreground transition-colors group-hover:text-accent">
+		{fm.title}
+	</h3>
+
+	{fm.event.length > 0 && (
+		<p class="mt-1 font-mono text-xs text-accent">{fm.event}</p>
+	)}
+
+	{fm.description.length > 0 && (
+		<p class="mt-2 text-sm leading-relaxed text-muted-foreground">{fm.description}</p>
+	)}
+
+	<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+		<div class="flex flex-wrap gap-1.5">
+			{fm.tags.slice(0, 4).map((tag, i) => <span class={tagClasses(tagAccent(i))}>{tag}</span>)}
+		</div>
+		{fm.location.length > 0 && (
+			<span class="inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+				<MapPin class="size-3.5 text-primary" />
+				{fm.location}
+			</span>
+		)}
+	</div>
+</a>

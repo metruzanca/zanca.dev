@@ -69,7 +69,7 @@ function blockFromMdast(node: MdastNode): Block | null {
 			const items = (list.children ?? [])
 				.map((child) => {
 					if (child.type !== 'listItem') return null;
-					const inlines = inlinesFromNodes((child as { children?: MdastNode[] }).children ?? []);
+					const inlines = listItemInlines(child);
 					return inlines.length === 0 ? null : inlines;
 				})
 				.filter((i): i is Inline[] => i !== null);
@@ -85,6 +85,54 @@ function blockFromMdast(node: MdastNode): Block | null {
 
 function inlinesFromNodes(nodes: MdastNode[]): Inline[] {
 	return nodes.map(inlineFromMdast).filter((i): i is Inline => i !== null);
+}
+
+/**
+ * List items contain block children (usually a paragraph, sometimes a nested
+ * list), not inline nodes, so they need flattening before rendering. Nested
+ * items are kept as extra lines on the parent item.
+ */
+function listItemInlines(item: MdastNode): Inline[] {
+	const out: Inline[] = [];
+
+	for (const child of (item as { children?: MdastNode[] }).children ?? []) {
+		if (child.type === 'paragraph') {
+			const inlines = inlinesFromNodes((child as { children?: MdastNode[] }).children ?? []);
+			if (inlines.length === 0) continue;
+			if (out.length > 0) out.push({ type: 'lineBreak' });
+			out.push(...inlines);
+			continue;
+		}
+
+		if (child.type === 'list') {
+			for (const sub of (child as { children?: MdastNode[] }).children ?? []) {
+				if (sub.type !== 'listItem') continue;
+				const inlines = listItemInlines(sub);
+				if (inlines.length === 0) continue;
+				if (out.length > 0) out.push({ type: 'lineBreak' });
+				out.push(...inlines);
+			}
+			continue;
+		}
+
+		if (child.type === 'blockquote') {
+			for (const quoted of (child as { children?: MdastNode[] }).children ?? []) {
+				const inlines = blockquoteInlines(quoted);
+				if (inlines.length === 0) continue;
+				if (out.length > 0) out.push({ type: 'lineBreak' });
+				out.push(...inlines);
+			}
+		}
+	}
+
+	return out;
+}
+
+function blockquoteInlines(node: MdastNode): Inline[] {
+	if (node.type === 'paragraph') {
+		return inlinesFromNodes((node as { children?: MdastNode[] }).children ?? []);
+	}
+	return [];
 }
 
 function inlineFromMdast(node: MdastNode): Inline | null {
