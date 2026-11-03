@@ -34,7 +34,7 @@ Gleam is a small, statically typed, functional language so making it work is mor
 - [The Farmer was Replaced](https://store.steampowered.com/app/2060160/The_Farmer_Was_Replaced/) (on steam, win/mac/linux)
 - Mod: [Lucy was Replaced](https://thunderstore.io/c/the-farmer-was-replaced/p/lucy_was_replaced/Lucy_Was_Replaced)
 - Codebase: [Lucy was Replaced](https://github.com/metruzanca/lucy-was-replaced)
-- [Slide Deck](https://slides.com/metruzanca/gg27)
+<!-- - [Slide Deck](https://slides.com/metruzanca/gg27) -->
 
 ## What I'll cover
 
